@@ -1,0 +1,65 @@
+# Listmonk Email Marketing - Docker Compose
+# Run this on your Alienware PC with Docker Desktop
+# VERSION: 2026.01.06
+
+version: "3.8"
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: listmonk-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: listmonk
+      POSTGRES_PASSWORD: listmonk_secure_password_2026
+      POSTGRES_DB: listmonk
+    volumes:
+      - listmonk-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U listmonk"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Listmonk Application
+  listmonk:
+    image: listmonk/listmonk:latest
+    container_name: listmonk-app
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Database connection
+      LISTMONK_db__host: db
+      LISTMONK_db__port: 5432
+      LISTMONK_db__user: listmonk
+      LISTMONK_db__password: listmonk_secure_password_2026
+      LISTMONK_db__database: listmonk
+      LISTMONK_db__ssl_mode: disable
+
+      # App settings
+      LISTMONK_app__address: "0.0.0.0:9000"
+      LISTMONK_app__admin_username: admin
+      LISTMONK_app__admin_password: EmailAdmin2026!
+    command: >
+      sh -c "./listmonk --install --yes && ./listmonk"
+
+  # Cloudflare Tunnel (connects to Cloudflare for remote access)
+  # This will be configured after you create the tunnel in Cloudflare dashboard
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared-tunnel
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - listmonk
+
+volumes:
+  listmonk-data:
+    name: listmonk-postgres-data
