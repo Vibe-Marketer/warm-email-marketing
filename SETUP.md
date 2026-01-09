@@ -14,6 +14,8 @@ This guide covers:
 
 **Time Required:** 60-90 minutes total
 
+**For AI Agents:** If you're an AI coding assistant helping a user set up this system, use [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) instead - it has more detailed agent-specific instructions.
+
 ---
 
 ## Prerequisites
@@ -28,15 +30,31 @@ Before starting, ensure you have:
 
 ---
 
+## ⚠️ CRITICAL: Configuration File Updates Required
+
+**Before running `docker-compose up`, you MUST replace placeholders in these files:**
+
+1. **`.env`** - Replace `REPLACE_WITH_YOUR_TUNNEL_TOKEN`
+2. **`tunnel-config.yml`** - Replace:
+   - `REPLACE_WITH_YOUR_TUNNEL_ID`
+   - `REPLACE_WITH_YOUR_DOMAIN_COM`
+3. **`tunnel-credentials.json`** - Download from Cloudflare (Step 5 below)
+
+**The system will FAIL to start if these placeholders are not replaced with your actual values.**
+
+See each step below for exact instructions on where to get these values and how to update the files.
+
+---
+
 ## Important Note for Fresh Installs
 
-**If you're setting up this repository from scratch** (cloning for the first time), follow these steps to avoid Docker configuration issues:
+**If you're setting up this repository from scratch** (cloning for the first time):
 
 1. Start with fresh configuration files (use `.env.example` as template)
 2. Create YOUR OWN Cloudflare tunnel (don't reuse existing tunnel credentials)
 3. Update ALL configuration files with your own values before running `docker-compose up`
 
-The existing `tunnel-config.yml` in this repo is an example. You MUST create your own tunnel and credentials.
+The existing `tunnel-config.yml` and `.env.example` contain placeholder values that **will not work** - you must replace them with your own.
 
 See detailed instructions below.
 

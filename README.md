@@ -13,6 +13,20 @@ Self-hosted email marketing platform running on Docker that gives you:
 
 **Cost:** ~$50-90/month (just Resend - everything else is free)
 
+---
+
+## ⚠️ IMPORTANT: Configuration Required
+
+**Before running `docker-compose up`, you MUST update these files with YOUR values:**
+
+- [ ] `.env` - Replace `REPLACE_WITH_YOUR_TUNNEL_TOKEN`
+- [ ] `tunnel-config.yml` - Replace `REPLACE_WITH_YOUR_TUNNEL_ID` and `REPLACE_WITH_YOUR_DOMAIN_COM`
+- [ ] `tunnel-credentials.json` - Download from Cloudflare (see step 5 below)
+
+**The system will FAIL to start if you skip these steps.**
+
+---
+
 ## Quick Start (New Setup)
 
 ### Prerequisites
