@@ -43,20 +43,16 @@ services:
 
       # App settings
       LISTMONK_app__address: "0.0.0.0:9000"
-      LISTMONK_app__admin_username: admin
-      LISTMONK_app__admin_password: EmailAdmin2026!
-    command: >
-      sh -c "./listmonk --install --yes && ./listmonk"
 
   # Cloudflare Tunnel (connects to Cloudflare for remote access)
-  # This will be configured after you create the tunnel in Cloudflare dashboard
   cloudflared:
     image: cloudflare/cloudflared:latest
     container_name: cloudflared-tunnel
     restart: unless-stopped
-    command: tunnel run
-    environment:
-      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    command: tunnel --config /etc/cloudflared/config.yml run
+    volumes:
+      - ./tunnel-config.yml:/etc/cloudflared/config.yml:ro
+      - ./tunnel-credentials.json:/etc/cloudflared/credentials.json:ro
     depends_on:
       - listmonk
 

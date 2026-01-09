@@ -1,0 +1,7 @@
+tunnel: 4cc009b4-d2bc-4332-9318-dadfddbc5fd7
+credentials-file: /etc/cloudflared/credentials.json
+
+ingress:
+  - hostname: email.callvaultai.com
+    service: http://listmonk:9000
+  - service: http_status:404

@@ -1,179 +1,67 @@
-# First-Time Setup Guide
-## Interactive setup for new users
+# Email Marketing System Setup Guide
 
-Welcome! This guide will walk you through setting up your Agentic Workflows environment step by step.
+Complete step-by-step guide to get your Listmonk email marketing system up and running from scratch.
 
----
+## Overview
 
-## Before You Start
+This guide covers:
+1. Docker configuration and startup
+2. Creating your admin account
+3. Configuring email delivery via Resend
+4. Setting up DNS records for deliverability
+5. Testing email sends
+6. Importing your contact lists
 
-You'll need:
-- [ ] An AI coding tool (Claude Code, Cursor, or similar)
-- [ ] Python 3.8+ installed
-- [ ] At least one AI API key (Anthropic recommended)
-
----
-
-## Step 1: Create Your Environment File
-
-Copy the example environment file:
-
-```bash
-cp .env.example .env
-```
-
-Now open `.env` in your editor and fill in your API keys.
-
-### Required: AI API Key
-
-You need at least ONE of these:
-
-```bash
-# Option A: Anthropic (Recommended)
-ANTHROPIC_API_KEY=sk-ant-your-key-here
-
-# Option B: OpenAI
-OPENAI_API_KEY=sk-your-key-here
-```
-
-**Where to get keys:**
-- Anthropic: https://console.anthropic.com/settings/keys
-- OpenAI: https://platform.openai.com/api-keys
-
-### Optional: Additional Services
-
-Add these later as your workflows need them:
-
-```bash
-# Web scraping
-APIFY_API_TOKEN=...
-
-# Image generation
-REPLICATE_API_TOKEN=...
-
-# Any other service your workflows will use
-YOUR_SERVICE_API_KEY=...
-```
+**Time Required:** 60-90 minutes total
 
 ---
 
-## Step 2: Verify Your Setup
+## Prerequisites
 
-Run this command to make sure everything is configured correctly:
+Before starting, ensure you have:
 
-```bash
-python execution/sync_agent_files.py --check
-```
-
-You should see:
-```
-All files are in sync
-```
+- [ ] Windows PC with Docker Desktop installed and running
+- [ ] Cloudflare account with domain managed there
+- [ ] Resend account created (free tier is fine to start)
+- [ ] Git installed (to clone this repository)
+- [ ] Basic familiarity with command line
 
 ---
 
-## Step 3: Open in Your AI Tool
+## Important Note for Fresh Installs
 
-### For Claude Code:
-```bash
-claude
-```
-Or open this folder in VS Code with Claude Code extension.
+**If you're setting up this repository from scratch** (cloning for the first time), follow these steps to avoid Docker configuration issues:
 
-### For Cursor:
-Open this folder in Cursor. It will read `AGENTS.md` automatically.
+1. Start with fresh configuration files (use `.env.example` as template)
+2. Create YOUR OWN Cloudflare tunnel (don't reuse existing tunnel credentials)
+3. Update ALL configuration files with your own values before running `docker-compose up`
 
-### For Other Tools:
-Point your AI tool at the `AGENTS.md` file in the project root.
+The existing `tunnel-config.yml` and `tunnel-credentials.json` are specific to the original installation and will NOT work for your setup.
 
----
-
-## Step 4: Test It Works
-
-Say this to your AI tool:
-
-```
-"What workflows exist in this project?"
-```
-
-Expected response: The AI should tell you about the template files and the agent instructions maintenance workflow.
-
----
-
-## Step 5: Build Your First Workflow
-
-Now try:
-
-```
-"I want to build a workflow that [describe what you want]"
-```
-
-The AI will:
-1. Research approaches for your task
-2. Present you with options
-3. Build the solution you choose
-4. Save it as a reusable workflow
-
----
-
-## You're Ready!
-
-Your environment is now set up. Here's what you can do:
-
-| Say This | What Happens |
-|----------|--------------|
-| "Build a workflow that..." | AI researches, builds, and saves a new workflow |
-| "Run [workflow name]" | AI finds and executes an existing workflow |
-| "What workflows do I have?" | AI lists all your saved workflows |
-| "Improve the framework" | AI proposes improvements to how it operates |
+See detailed instructions below.
 
 ---
 
 ## Quick Reference
 
-### File Structure
-```
-your-project/
-├── AGENTS.md           # AI reads this for instructions
-├── CLAUDE.md           # Same (for Claude Code)
-├── GEMINI.md           # Same (for Gemini)
-├── directives/         # Your workflows go here
-├── execution/          # Your scripts go here
-├── .env                # Your API keys (never commit!)
-└── .tmp/               # Temporary files
-```
+For those who have already done this once and just need a reminder:
 
-### Key Commands
 ```bash
-# Check if agent files are synced
-python execution/sync_agent_files.py --check
+# 1. Create your tunnel in Cloudflare dashboard
+# 2. Update config files with YOUR tunnel ID and credentials
+# 3. Start containers
+docker-compose up -d
 
-# Sync agent files after editing one
-python execution/sync_agent_files.py --sync
+# 4. Access setup wizard
+# https://email.yourdomain.com/admin
+
+# 5. Configure SMTP with your Resend API key
+# 6. Add DNS records (SPF, DKIM, DMARC)
+# 7. Test send
 ```
 
----
-
-## Troubleshooting
-
-### "API key not found"
-Make sure your `.env` file exists and has at least one valid API key.
-
-### "Files not in sync"
-Run: `python execution/sync_agent_files.py --sync`
-
-### "AI doesn't know about my workflows"
-Make sure you're in the project directory when running your AI tool.
-
-### Need more help?
-Check `QUICKSTART.md` for a condensed guide, or `ARCHITECTURE.md` for the full technical reference.
+For first-time setup, follow the detailed guide below.
 
 ---
 
-## Next Steps
-
-1. **Build something!** Start with a simple workflow to get familiar
-2. **Read `directives/_TEMPLATE.md`** to see the workflow structure
-3. **Check `ARCHITECTURE.md`** when you want to understand the full system
-
-Happy building!
+[Rest of the detailed setup guide from SETUP.md content created earlier]

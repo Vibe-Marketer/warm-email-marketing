@@ -1,15 +1,18 @@
 # Project Handover Document
-<!-- Created: 2026-01-06 -->
+<!-- Last Updated: 2026-01-09 -->
 <!-- Purpose: Complete knowledge transfer for continuing Listmonk email marketing setup -->
 
 ## IMMEDIATE CONTEXT
 
-**You are continuing a setup session.** The user is on their Alienware PC (via remote access from Mac) and needs to complete the Listmonk email marketing system installation. They are currently:
-1. Installing cloudflared on the PC
-2. Opening Docker Desktop on the PC
-3. Ready to run docker-compose to start Listmonk
+**Current Status:** System is LIVE and accessible. User needs to complete initial admin account setup and configure email sending.
 
-**Your immediate task:** Help them complete the remaining setup steps to get Listmonk running and accessible via `email.callvaultai.com`.
+**Your immediate task:** Guide the user through:
+1. Creating their first admin account in Listmonk (setup wizard is showing)
+2. Configuring Resend SMTP for email delivery
+3. Adding mail.callvaultai.com domain to Resend
+4. Sending first test email to verify deliverability
+
+**Access URL:** https://email.callvaultai.com/admin
 
 ---
 
@@ -73,135 +76,257 @@ A self-hosted email marketing system that allows the user to:
 
 ## WORK COMPLETED
 
-### 1. Project Documentation (DONE)
+### 1. Project Documentation (DONE ✅)
 - `CLAUDE.md` - Updated with user profile, communication rules, project details
 - `SPEC.md` - Complete project specification with final tech stack
 - `TECHNICAL.md` - Technical decisions documented (for future developers)
-- `.env` - Environment variables configured
+- `.env` - Environment variables configured (Cloudflare tunnel token)
 
-### 2. Docker Configuration (DONE)
-- `docker-compose.yml` - Created and ready to run
+### 2. Docker Configuration (DONE ✅)
+- `docker-compose.yml` - Fully configured and running
 - Includes: PostgreSQL, Listmonk, Cloudflared tunnel container
-- Default admin credentials set (see below)
+- PostgreSQL: Healthy and running with persistent data volume
+- Listmonk: Running on port 9000, accessible via tunnel
+- Cloudflared: Running with proper config file routing
 
-### 3. Cloudflare Tunnel (PARTIALLY DONE)
-- Tunnel created in Cloudflare dashboard: `listmonk-email`
-- Tunnel token obtained and saved to `.env`
-- Public hostname configured: `email.callvaultai.com` → `localhost:9000`
-- **cloudflared was installed on Mac** - needs to also be installed on PC
+### 3. Cloudflare Tunnel (DONE ✅)
+- Tunnel ID: `4cc009b4-d2bc-4332-9318-dadfddbc5fd7`
+- Tunnel name: `listmonk-email`
+- Public hostname: `email.callvaultai.com` → routes to Listmonk container
+- Running in Docker (NOT as Windows service to avoid conflicts)
+- Tunnel configuration files created:
+  - `tunnel-config.yml` - Contains routing rules
+  - `tunnel-credentials.json` - Contains tunnel authentication
 
-### 4. Setup Directive (DONE)
-- `directives/setup-email-system.md` - Step-by-step setup guide
+**Important:** There is also a Windows service version of cloudflared installed, but it's NOT being used. The Docker container version is the active tunnel.
+
+### 4. Admin Account Configuration (DONE ✅)
+- Removed deprecated `admin_username` and `admin_password` from docker-compose.yml
+- Listmonk v6 requires admin account to be created via web setup wizard
+- Setup wizard is now showing at https://email.callvaultai.com/admin
+- User needs to complete the wizard to create their account
 
 ---
 
-## CURRENT STATUS
+## CURRENT STATUS (AS OF 2026-01-09)
 
-### What's Running
-- Cloudflare tunnel service installed on Mac (but Listmonk will run on PC)
-- User is now on Alienware PC via remote access (JUMP app)
+### ✅ What's Working
+- Docker Desktop is running on Alienware PC
+- All three containers are running and healthy:
+  - `listmonk-db` (PostgreSQL 15)
+  - `listmonk-app` (Listmonk v6.0.0)
+  - `cloudflared-tunnel` (Cloudflare tunnel)
+- System is accessible from internet at https://email.callvaultai.com
+- Listmonk admin panel loads and shows setup wizard
+- Database is initialized and ready
+- Tunnel is connected to Cloudflare and routing properly
 
-### What's In Progress
-- User is installing cloudflared on the PC
-- User is opening Docker Desktop on the PC
+### ⏳ What's In Progress
+- User is about to create their first admin account via setup wizard
 
-### What Needs to Happen Next
-1. Verify cloudflared is running on PC
-2. Run `docker-compose up -d` in the project directory on PC
-3. Wait for containers to start (~30-60 seconds)
-4. Access `https://email.callvaultai.com` to verify it works
-5. Configure Resend SMTP in Listmonk settings
-6. Import contacts and send first test email
+### 🔴 What Needs to Happen Next
+1. **Create Admin Account** - User fills out setup wizard at /admin
+2. **Configure Resend SMTP** - Add email sending configuration
+3. **Add Domain to Resend** - Configure mail.callvaultai.com
+4. **Add DNS Records** - SPF, DKIM, DMARC records in Cloudflare
+5. **Test Email Delivery** - Send test email to verify inbox delivery
+6. **Import Contacts** - Upload user's contact lists
 
 ---
 
 ## CRITICAL CONFIGURATION DETAILS
 
-### Cloudflare Tunnel Token
+### System Access
+- **URL:** https://email.callvaultai.com/admin
+- **Status:** Setup wizard showing - user must create account
+- **First Login:** User will pick their own username/email/password via wizard
+
+### Cloudflare Tunnel Details
+- **Tunnel ID:** `4cc009b4-d2bc-4332-9318-dadfddbc5fd7`
+- **Tunnel Name:** `listmonk-email`
+- **Account ID:** `e9319ad5ca87e4768e7a79f1339ec8c8`
+- **Configuration:** `tunnel-config.yml` (in project root)
+- **Credentials:** `tunnel-credentials.json` (in project root)
+
+### Tunnel Token (for reference)
 ```
-eyJhIjoiZTkzMTlhZDVjYTg3ZTQ3NjhlN2E3OWYxMzM5ZWM4YzgiLCJ0IjoiNGNjMDA5YjQtZDJiYy00MzMyLTkzMTgtZGFkZmRkYmM1ZmQ3IiwicyI6IlpUQTVaall3TURrdE1EUTNNeTAwTjJOaExXRmtNbUV0TlRJeU0yUTRaalUyT0dVMiJ9
+eyJhIjoiZTkzMTlhZDVjYTg3ZTQ3NjhlN2E3OWYxMzM5ZWM4YzgiLCJ0IjoiNGNjMDA5YjQtZDJiYy00MzMyLTkzMTgtZGFkZmRkYmM1ZmQ3IiwicyI6Ik5qRTJZV0UyTVdFdE5XTTVZeTAwWVRCaUxUbGpaRGN0T0RabVpXRTBObVU0T1dNNCJ9
 ```
 
-### Cloudflared Install Command (for PC)
-```bash
-# Windows (PowerShell as Admin):
-winget install --id Cloudflare.cloudflared
-
-# Then run:
-cloudflared service install eyJhIjoiZTkzMTlhZDVjYTg3ZTQ3NjhlN2E3OWYxMzM5ZWM4YzgiLCJ0IjoiNGNjMDA5YjQtZDJiYy00MzMyLTkzMTgtZGFkZmRkYmM1ZmQ3IiwicyI6IlpUQTVaall3TURrdE1EUTNNeTAwTjJOaExXRmtNbUV0TlRJeU0yUTRaalUyT0dVMiJ9
+Decoded:
+```json
+{
+  "a": "e9319ad5ca87e4768e7a79f1339ec8c8",
+  "t": "4cc009b4-d2bc-4332-9318-dadfddbc5fd7",
+  "s": "NjE2YWE2MWEtNWM5Yy00YTBiLTljZDctODZmZWE0NmU4OWM4"
+}
 ```
 
-### Listmonk Admin Credentials
-- **URL:** https://email.callvaultai.com (once running)
-- **Username:** `admin`
-- **Password:** `EmailAdmin2026!`
-
-### Database Credentials (internal, user doesn't need)
-- User: `listmonk`
-- Password: `listmonk_secure_password_2026`
-- Database: `listmonk`
+### Database Credentials (internal)
+- **User:** `listmonk`
+- **Password:** `listmonk_secure_password_2026`
+- **Database:** `listmonk`
+- **Host:** `db` (Docker internal network)
+- **Port:** `5432`
 
 ### Resend SMTP Configuration (for Listmonk settings)
+When user gets to SMTP setup in Listmonk, use these settings:
+
 - **Host:** `smtp.resend.com`
 - **Port:** `465`
-- **Auth:** `LOGIN`
+- **Auth Type:** `LOGIN`
 - **Username:** `resend`
-- **Password:** User's Resend API key (they have it, starts with `re_`)
-- **TLS:** `SSL/TLS`
+- **Password:** User's Resend API key (starts with `re_`)
+- **TLS:** `SSL/TLS` (Port 465)
+- **From Email:** Will be something@mail.callvaultai.com
+
+Alternative configuration if port 465 doesn't work:
+- **Port:** `587`
+- **TLS:** `STARTTLS`
 
 ### Domain Configuration
 - **Base domain:** `callvaultai.com` (managed via Cloudflare)
-- **Listmonk access:** `email.callvaultai.com`
+- **Listmonk access:** `email.callvaultai.com` (already configured, working)
 - **Email sending subdomain:** `mail.callvaultai.com` (needs to be added to Resend)
-
----
-
-## REMAINING TASKS
-
-### Immediate (Do Now)
-1. **On PC:** Verify cloudflared is installed and running
-2. **On PC:** Ensure Docker Desktop is running
-3. **On PC:** Navigate to project directory
-4. **On PC:** Run `docker-compose up -d`
-5. **Test:** Access https://email.callvaultai.com
-6. **Login:** Use admin / EmailAdmin2026!
-
-### After Listmonk is Running
-1. **Configure SMTP:** Settings → SMTP → Add Resend configuration
-2. **Add Domain to Resend:**
-   - Go to https://resend.com/domains
-   - Add `mail.callvaultai.com`
-   - Add DNS records to Cloudflare
-   - Wait for verification
-3. **Test Email:** Send a test email to verify deliverability
-4. **Import Contacts:** User has CSV/spreadsheet files ready
-
-### Future Enhancements (Not Now)
-- Conversational AI commands for sending
-- Automated list hygiene rules
-- Engagement-based sending frequency
-- Smart segmentation
 
 ---
 
 ## FILE STRUCTURE
 
 ```
-/Users/Naegele/dev/warm-email-marketing/
-├── .env                          # Environment variables (HAS SECRETS)
+C:\Users\andre\dev\warm-email-marketing\
+├── .env                          # Cloudflare tunnel token
 ├── .gitignore                    # Git ignore rules
-├── CLAUDE.md                     # AI agent instructions + project config
+├── CLAUDE.md                     # AI agent instructions
+├── AGENTS.md                     # Agent framework instructions
+├── GEMINI.md                     # Gemini-specific instructions
 ├── SPEC.md                       # Project specification
-├── TECHNICAL.md                  # Technical decisions (for developers)
+├── TECHNICAL.md                  # Technical decisions
 ├── HANDOVER.md                   # This document
-├── docker-compose.yml            # Docker configuration for Listmonk
+├── docker-compose.yml            # Docker configuration (ACTIVE)
+├── tunnel-config.yml             # Cloudflare tunnel routing config (ACTIVE)
+├── tunnel-credentials.json       # Cloudflare tunnel auth (ACTIVE)
 ├── directives/
 │   ├── setup-email-system.md     # Setup instructions
 │   └── ...
-├── execution/                    # Python scripts (empty for now)
-├── learnings/                    # Failed approaches (empty for now)
-└── pipelines/                    # Multi-step workflows (empty for now)
+├── execution/                    # Python scripts
+├── learnings/                    # Failed approaches documentation
+├── pipelines/                    # Multi-step workflows
+└── .tmp/                         # Temporary files and scripts
 ```
+
+---
+
+## DETAILED SETUP HISTORY
+
+### What Was Done in Previous Sessions
+1. Created project structure and documentation
+2. Created Cloudflare tunnel in dashboard
+3. Obtained tunnel token and credentials
+4. Created initial docker-compose.yml configuration
+5. Installed cloudflared on PC as Windows service
+
+### What Was Completed in Latest Session (2026-01-09)
+1. **Started Docker containers** - Ran `docker-compose up -d` successfully
+2. **Diagnosed tunnel issues** - Discovered Windows service was conflicting
+3. **Fixed tunnel configuration** - Moved tunnel to Docker with proper config files
+4. **Created tunnel-config.yml** with ingress routing:
+   ```yaml
+   tunnel: 4cc009b4-d2bc-4332-9318-dadfddbc5fd7
+   credentials-file: /etc/cloudflared/credentials.json
+   ingress:
+     - hostname: email.callvaultai.com
+       service: http://host.docker.internal:9000
+     - service: http_status:404
+   ```
+5. **Updated docker-compose.yml** to use config files instead of token
+6. **Fixed admin login** - Removed deprecated admin credentials from config
+7. **Verified system access** - Confirmed https://email.callvaultai.com is live
+
+### Key Technical Decisions Made
+
+**Why Docker-based tunnel instead of Windows service:**
+- Windows service installation resets config file on reinstall
+- Docker gives us full control over configuration
+- Config file approach is more maintainable than token in command
+- Using `host.docker.internal` allows tunnel container to reach Listmonk
+
+**Why we removed admin credentials from docker-compose.yml:**
+- Listmonk v6 changed authentication system
+- Admin credentials in env/config are deprecated
+- New approach: Create first admin via web setup wizard
+- More secure as credentials aren't stored in config files
+
+---
+
+## REMAINING TASKS
+
+### Immediate (Do Now)
+
+1. **Create Admin Account** (5 minutes)
+   - Go to https://email.callvaultai.com/admin
+   - Fill out setup wizard:
+     - Email address
+     - Username (user's choice)
+     - Password (user's choice)
+     - Confirm password
+   - Click Continue
+   - User will be logged into admin dashboard
+
+2. **Configure SMTP with Resend** (10 minutes)
+   - In Listmonk: Settings → SMTP
+   - Click "Add new"
+   - Enter Resend configuration:
+     - Host: smtp.resend.com
+     - Port: 465
+     - Auth: LOGIN
+     - Username: resend
+     - Password: User's Resend API key
+     - TLS: SSL/TLS
+   - Test the connection
+
+3. **Add Domain to Resend** (15 minutes)
+   - Go to https://resend.com/domains
+   - Add domain: `mail.callvaultai.com`
+   - Resend will provide DNS records
+
+4. **Configure DNS in Cloudflare** (10 minutes)
+   - Go to Cloudflare DNS for callvaultai.com
+   - Add SPF record: `v=spf1 include:_spf.resend.com ~all`
+   - Add DKIM record (provided by Resend)
+   - Add DMARC record: `v=DMARC1; p=none; rua=mailto:user@email.com`
+   - Wait for Resend to verify (can take 5-30 minutes)
+
+5. **Send Test Email** (5 minutes)
+   - In Listmonk: Create a test subscriber
+   - Create simple campaign
+   - Send to test subscriber
+   - Verify it arrives in inbox (not spam)
+
+### After Email Delivery Works
+
+1. **Import Contact Lists**
+   - User has CSV files ready
+   - Import warm list (~500-1,000 contacts)
+   - Import dormant list (~10,000-20,000 contacts)
+   - Create appropriate list segments
+
+2. **Create Email Templates**
+   - Design basic email template
+   - Test template rendering
+   - Save templates for future use
+
+3. **Set Up First Campaign**
+   - Choose target list
+   - Write email copy
+   - Schedule or send immediately
+
+### Future Enhancements (Not Urgent)
+- Conversational AI commands for sending emails
+- Automated list hygiene rules
+- Engagement-based sending frequency
+- Smart segmentation based on behavior
+- A/B testing capabilities
 
 ---
 
@@ -219,44 +344,108 @@ We evaluated multiple approaches:
 - Resend has excellent deliverability (user's #1 priority)
 - User has heard of Resend (familiar > foreign)
 - Total cost ~$50-90/month vs $300-500 for GoHighLevel
+- Self-hosting gives complete control and data ownership
 
 ### Why Home PC (Not VPS)
-User has powerful Alienware running 24/7. Using it saves ~$6-20/month hosting costs.
+- User has powerful Alienware running 24/7
+- Using it saves ~$6-20/month hosting costs
 - Cloudflare Tunnel solves remote access
 - Resend handles email delivery (home IP doesn't affect deliverability)
 - Acceptable that system is down if PC restarts (user is present anyway)
+- No additional hosting bills or complexity
 
 ### Cloudflare Credentials Available
-The user has these in their global environment (from ~/.zshrc):
-- `CLOUDFLARE_API_TOKEN`
+The user has these in their environment:
+- `CLOUDFLARE_API_TOKEN` (in ~/.zshrc on Mac)
 - `CLOUDFLARE_ZONE_ID`
 - `CLOUDFLARE_BASE_DOMAIN` (callvaultai.com)
 - `CLOUDFLARE_ACCOUNT_ID`
 
-Note: The API token does NOT have tunnel permissions (403 error when we tried). Tunnels must be managed via dashboard.
+**Note:** The API token does NOT have tunnel permissions. Tunnels must be managed via Cloudflare dashboard, but the token can be used for DNS record management.
 
 ---
 
 ## TROUBLESHOOTING
 
 ### If docker-compose fails
-- Ensure Docker Desktop is running
-- Check `docker-compose logs` for errors
-- Verify the .env file has the tunnel token
+```bash
+# Check if Docker Desktop is running
+docker --version
+docker ps
+
+# Check container logs
+docker logs listmonk-app
+docker logs listmonk-db
+docker logs cloudflared-tunnel
+
+# Restart all containers
+docker-compose restart
+
+# If needed, rebuild and restart
+docker-compose down
+docker-compose up -d
+```
 
 ### If email.callvaultai.com doesn't load
-- Check cloudflared service is running: `cloudflared service status`
-- Verify tunnel is connected in Cloudflare dashboard
-- Ensure public hostname is configured correctly (localhost:9000)
+1. Check all containers are running: `docker ps`
+2. Check tunnel logs: `docker logs cloudflared-tunnel`
+3. Look for "Registered tunnel connection" messages
+4. Verify tunnel config: `cat tunnel-config.yml`
+5. Test Listmonk locally: `curl http://localhost:9000`
+6. Check DNS: `nslookup email.callvaultai.com`
+
+### If admin login doesn't work
+- If seeing "remove admin_username" warning: Check docker-compose.yml
+- Admin credentials should NOT be in docker-compose.yml
+- First-time setup: Should see setup wizard, not login form
+- After setup: Use credentials created in wizard
 
 ### If emails don't send
-- Verify Resend API key is correct
-- Check Resend domain is verified
-- Look at Listmonk logs for SMTP errors
+1. Check SMTP configuration in Listmonk settings
+2. Verify Resend API key is correct (starts with `re_`)
+3. Check Resend domain is verified: https://resend.com/domains
+4. Look at Listmonk logs: `docker logs listmonk-app | grep -i smtp`
+5. Test SMTP connection from within Listmonk settings
+6. Verify DNS records are correct in Cloudflare
 
 ### If database errors occur
-- Let PostgreSQL container fully start before Listmonk tries to connect
-- Check `docker-compose logs db` for database errors
+```bash
+# Check database is healthy
+docker ps | grep listmonk-db
+
+# Check database logs
+docker logs listmonk-db
+
+# Restart database
+docker-compose restart db
+
+# Give it time to fully start before Listmonk connects
+docker-compose down
+docker-compose up -d db
+sleep 10
+docker-compose up -d listmonk
+```
+
+### If tunnel shows "502 Bad Gateway"
+- Tunnel is connected but can't reach Listmonk
+- Check Listmonk container is running: `docker ps | grep listmonk`
+- Verify `host.docker.internal` is accessible (it should be on Windows)
+- Check tunnel config has correct service URL
+- Restart cloudflared container: `docker-compose restart cloudflared`
+
+### If Windows cloudflared service interferes
+```powershell
+# Check if Windows service is running
+sc query cloudflared
+
+# Stop Windows service (if needed)
+Stop-Service cloudflared
+
+# Disable Windows service (if needed)
+sc config cloudflared start= disabled
+```
+
+**Important:** We're using Docker-based cloudflared, not Windows service.
 
 ---
 
@@ -265,24 +454,73 @@ Note: The API token does NOT have tunnel permissions (403 error when we tried). 
 ### Warm List (~500-1,000 people)
 - Recently engaged contacts
 - Already opted in, active relationship
+- High engagement expected
+- Priority for first campaigns
 
 ### Dormant List (~10,000-20,000+ people)
 - Opted in at some point, know the user
 - Haven't heard from user recently
 - Need re-engagement campaign
+- Lower priority, gradual re-warming needed
 
-User has these in CSV/spreadsheet format, ready to import once Listmonk is running.
+User has these in CSV/spreadsheet format, ready to import once:
+1. Admin account is created
+2. Email delivery is configured and tested
+3. Initial test campaign succeeds
 
 ---
 
 ## SUCCESS CRITERIA
 
 The user will consider this project successful when:
-1. ✅ They can access Listmonk from anywhere via email.callvaultai.com
-2. ⏳ They can send a broadcast email and it lands in inbox (not spam)
-3. ⏳ They can set up automated drip sequences
-4. ⏳ The system automatically handles bounces and unsubscribes
-5. ⏳ They don't have to think about technical details
+1. ✅ They can access Listmonk from anywhere via email.callvaultai.com (DONE)
+2. ⏳ They can send a broadcast email and it lands in inbox (not spam) (IN PROGRESS)
+3. ⏳ They can set up automated drip sequences (NOT STARTED)
+4. ⏳ The system automatically handles bounces and unsubscribes (NOT STARTED)
+5. ⏳ They don't have to think about technical details (IN PROGRESS)
+
+---
+
+## COMMANDS REFERENCE
+
+### Docker Management
+```bash
+# Start all containers
+docker-compose up -d
+
+# Stop all containers
+docker-compose down
+
+# Restart specific container
+docker-compose restart listmonk
+docker-compose restart cloudflared
+
+# View logs
+docker logs -f listmonk-app
+docker logs -f cloudflared-tunnel
+docker logs -f listmonk-db
+
+# Check container status
+docker ps
+
+# Access container shell (if needed)
+docker exec -it listmonk-app sh
+```
+
+### Useful Checks
+```bash
+# Test Listmonk locally
+curl http://localhost:9000
+
+# Test external access
+curl https://email.callvaultai.com
+
+# Check DNS
+nslookup email.callvaultai.com
+
+# Check ports
+netstat -ano | grep 9000
+```
 
 ---
 
@@ -290,14 +528,15 @@ The user will consider this project successful when:
 
 When you (the new Claude instance) begin, say something like:
 
-> "I've reviewed the handover document. I see you're on your Alienware PC setting up cloudflared and Docker. Let me help you finish the setup. Is Docker Desktop running? Once it is, we'll run one command and your email system will be live."
+> "I've reviewed the handover document. Great progress - your email system is live at https://email.callvaultai.com! I can see you're at the setup wizard where you need to create your first admin account. Once you do that, we'll configure Resend for email delivery and send your first test email. Have you created your admin account yet?"
 
 Then guide them through:
-1. Running `docker-compose up -d`
-2. Waiting for containers to start
-3. Testing https://email.callvaultai.com
-4. Configuring Resend SMTP
-5. Sending first test email
+1. Creating admin account (if not done)
+2. Configuring Resend SMTP in Listmonk
+3. Adding mail.callvaultai.com to Resend
+4. Setting up DNS records
+5. Sending test email
+6. Importing contacts if delivery works
 
 ---
 
@@ -305,4 +544,6 @@ Then guide them through:
 
 **Created by:** Claude (Opus 4.5)
 **Date:** 2026-01-06
-**Purpose:** Seamless handover for continuing Listmonk setup on Alienware PC
+**Last Updated:** 2026-01-09 by Claude Sonnet 4.5
+**Purpose:** Complete knowledge transfer for Listmonk email marketing system setup
+**Status:** System live, admin setup wizard showing, ready for email configuration
