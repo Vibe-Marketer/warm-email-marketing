@@ -1,0 +1,30 @@
+# Cloudflare Tunnel Configuration
+# VERSION: 2026.01.09
+#
+# ⚠️ REQUIRED: Replace ALL placeholder values below before running docker-compose
+# ⚠️ This file will FAIL if placeholders are not replaced
+#
+# Instructions:
+# 1. Create tunnel at https://one.dash.cloudflare.com/ → Networks → Tunnels
+# 2. Copy your tunnel ID (UUID format: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
+# 3. Replace REPLACE_WITH_YOUR_TUNNEL_ID below
+# 4. Replace REPLACE_WITH_YOUR_DOMAIN_COM with your actual domain
+# 5. Download tunnel credentials JSON and save as tunnel-credentials.json
+#
+# See SETUP.md Part 1 for detailed instructions
+
+# Replace this with YOUR tunnel ID from Cloudflare dashboard
+tunnel: REPLACE_WITH_YOUR_TUNNEL_ID
+
+# Path to credentials file (this path is correct, don't change it)
+credentials-file: /etc/cloudflared/credentials.json
+
+# Routing rules - MUST update hostname with your domain
+ingress:
+  # Replace email.REPLACE_WITH_YOUR_DOMAIN_COM with your actual subdomain
+  # Example: email.yourdomain.com
+  - hostname: email.REPLACE_WITH_YOUR_DOMAIN_COM
+    service: http://listmonk:9000
+
+  # Default 404 response (don't change this)
+  - service: http_status:404

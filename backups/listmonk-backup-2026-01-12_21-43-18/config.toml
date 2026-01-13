@@ -1,0 +1,25 @@
+[app]
+address = "0.0.0.0:9000"
+admin_username = "admin"
+admin_password = "listmonk"
+
+# REQUIRED: Set language (2-letter ISO code)
+lang = "en"
+
+# Upload settings
+[upload]
+provider = "filesystem"
+filesystem_upload_path = "/listmonk/uploads"
+filesystem_upload_uri = "/uploads"
+
+# Database.
+[db]
+host = "db"
+port = 5432
+user = "listmonk"
+password = "listmonk_secure_password_2026"
+database = "listmonk"
+ssl_mode = "disable"
+max_open = 25
+max_idle = 25
+max_lifetime = "300s"
